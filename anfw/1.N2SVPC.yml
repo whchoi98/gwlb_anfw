@@ -9,8 +9,8 @@ Metadata:
          - AvailabilityZoneA
          - AvailabilityZoneB
          - VPCCIDRBlock
-         - GWLBeSubnetABlock
-         - GWLBeSubnetBBlock
+         - ANFWeSubnetABlock
+         - ANFWeSubnetBBlock
          - PublicSubnetABlock
          - PublicSubnetBBlock
          - PrivateSubnetABlock
@@ -52,15 +52,15 @@ Parameters:
     Default: 10.11.0.0/16
     Description: "The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range."
 
-  GWLBeSubnetABlock:
+  ANFWeSubnetABlock:
     Type: String
     Default: 10.11.1.0/24
-    Description: "CidrBlock for AZ A GWLBe subnet A within the VPC"   
+    Description: "CidrBlock for AZ A ANFWe subnet A within the VPC"   
 
-  GWLBeSubnetBBlock:
+  ANFWeSubnetBBlock:
     Type: String
     Default: 10.11.2.0/24
-    Description: "CidrBlock for AZ B GWLBe subnet B within the VPC"
+    Description: "CidrBlock for AZ B ANFWe subnet B within the VPC"
 
   PublicSubnetABlock:
     Type: String
@@ -149,7 +149,7 @@ Parameters:
 
   VPCEndpointServiceName:
     Type: String
-    Description: Check the name of the VPC Endpoint Service in the GWLB VPC. 
+    Description: Check the name of the VPC Endpoint Service in the ANFW VPC. 
 
   InstanceType:
     Type: String
@@ -266,27 +266,27 @@ Resources:
 # Create-Public-Subnet: VPC Public_Subnet_a,b #
 ###############################################
 
-  GWLBeSubnetA:
+  ANFWeSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Ref GWLBeSubnetABlock
+      CidrBlock: !Ref ANFWeSubnetABlock
       AvailabilityZone: !Ref AvailabilityZoneA
       MapPublicIpOnLaunch: "true"
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-GWLBe-Subnet-A'
+          Value: !Sub '${AWS::StackName}-ANFWe-Subnet-A'
 
-  GWLBeSubnetB:
+  ANFWeSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Ref GWLBeSubnetBBlock
+      CidrBlock: !Ref ANFWeSubnetBBlock
       AvailabilityZone: !Ref AvailabilityZoneB
       MapPublicIpOnLaunch: "true"
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-GWLBe-Subnet-B'
+          Value: !Sub '${AWS::StackName}-ANFWe-Subnet-B'
 
 ###############################################
 # Create-Public-Subnet: VPC Public_Subnet_a,b #
@@ -334,81 +334,81 @@ Resources:
 
   AddRouteIgwRouteTable1:
     Type: AWS::EC2::Route
-    DependsOn: GWLBVPCEndpointA
+    DependsOn: ANFWVPCEndpointA
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetABlock
-      VpcEndpointId: !Ref GWLBVPCEndpointA
+      VpcEndpointId: !Ref ANFWVPCEndpointA
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable2:
     Type: AWS::EC2::Route
-    DependsOn: GWLBVPCEndpointB
+    DependsOn: ANFWVPCEndpointB
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetBBlock
-      VpcEndpointId: !Ref GWLBVPCEndpointB
+      VpcEndpointId: !Ref ANFWVPCEndpointB
       RouteTableId: !Ref IgwRouteTable    
 
   AddRouteIgwRouteTable3:
     Type: AWS::EC2::Route
-    DependsOn: GWLBVPCEndpointA
+    DependsOn: ANFWVPCEndpointA
     Properties:
-      DestinationCidrBlock: !Ref GWLBeSubnetABlock
-      VpcEndpointId: !Ref GWLBVPCEndpointA
+      DestinationCidrBlock: !Ref ANFWeSubnetABlock
+      VpcEndpointId: !Ref ANFWVPCEndpointA
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable4:
     Type: AWS::EC2::Route
-    DependsOn: GWLBVPCEndpointB
+    DependsOn: ANFWVPCEndpointB
     Properties:
-      DestinationCidrBlock: !Ref GWLBeSubnetBBlock
-      VpcEndpointId: !Ref GWLBVPCEndpointB
+      DestinationCidrBlock: !Ref ANFWeSubnetBBlock
+      VpcEndpointId: !Ref ANFWVPCEndpointB
       RouteTableId: !Ref IgwRouteTable    
 
 ################################################
-# Create-RouteTable: GWLBe Route Table    #
+# Create-RouteTable: ANFWe Route Table    #
 ################################################
 
-  GWLBeSubnetARouteTable:
+  ANFWeSubnetARouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-GWLBeA-RT'
+          Value: !Sub '${AWS::StackName}-ANFWeA-RT'
 
-  GWLBeSubnetRouteTableAAssociation:
+  ANFWeSubnetRouteTableAAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref GWLBeSubnetA
-      RouteTableId: !Ref GWLBeSubnetARouteTable
+      SubnetId: !Ref ANFWeSubnetA
+      RouteTableId: !Ref ANFWeSubnetARouteTable
 
-  GWLBeRouteTableA1:
+  ANFWeRouteTableA1:
     DependsOn: VPCGatewayAttachment
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref GWLBeSubnetARouteTable
+      RouteTableId: !Ref ANFWeSubnetARouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
       GatewayId: !Ref InternetGateway
 
-  GWLBeSubnetBRouteTable:
+  ANFWeSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-GWLBe-B-RT'  
+          Value: !Sub '${AWS::StackName}-ANFWe-B-RT'  
 
-  GWLBeSubnetRouteTableBAssociation:
+  ANFWeSubnetRouteTableBAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref GWLBeSubnetB
-      RouteTableId: !Ref GWLBeSubnetBRouteTable
+      SubnetId: !Ref ANFWeSubnetB
+      RouteTableId: !Ref ANFWeSubnetBRouteTable
 
-  GWLBeRouteTableB1:
+  ANFWeRouteTableB1:
     DependsOn: VPCGatewayAttachment
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref GWLBeSubnetBRouteTable
+      RouteTableId: !Ref ANFWeSubnetBRouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
       GatewayId: !Ref InternetGateway
 
@@ -430,12 +430,12 @@ Resources:
       RouteTableId: !Ref PublicSubnetARouteTable
 
   PublicRouteTableA1:
-    DependsOn: GWLBVPCEndpointA
+    DependsOn: ANFWVPCEndpointA
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetARouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !Ref GWLBVPCEndpointA
+      VpcEndpointId: !Ref ANFWVPCEndpointA
 
   PublicSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
@@ -452,12 +452,12 @@ Resources:
       RouteTableId: !Ref PublicSubnetBRouteTable
 
   PublicRouteTableB1:
-    DependsOn: GWLBVPCEndpointB
+    DependsOn: ANFWVPCEndpointB
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetBRouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !Ref GWLBVPCEndpointB
+      VpcEndpointId: !Ref ANFWVPCEndpointB
 
 
 ################################################
@@ -629,28 +629,6 @@ Resources:
       RouteTableId: !Ref TGWSubnetBRouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
       NatGatewayId: !Ref NatGatewayB
-
-###############################################
-# Create-VPCEndPoint                          #
-###############################################
-
-  GWLBVPCEndpointA:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      VpcId: !Ref VPC
-      ServiceName: !Ref VPCEndpointServiceName
-      VpcEndpointType: GatewayLoadBalancer
-      SubnetIds:
-        - !Ref GWLBeSubnetA
-
-  GWLBVPCEndpointB:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      VpcId: !Ref VPC
-      ServiceName: !Ref VPCEndpointServiceName
-      VpcEndpointType: GatewayLoadBalancer
-      SubnetIds:
-        - !Ref GWLBeSubnetB
 
 ###############################################################################
 # Create-Security-Group: VPC Security Group - HTTP, HTTPS, ICMP , SSH Permit #
@@ -1012,6 +990,111 @@ Resources:
         - Id: !Ref PrivateBInstance2
           Port: 80
 
+###############
+Firewall
+###############
+
+  ICMPAlertStatefulRuleGroup:
+    Type: 'AWS::NetworkFirewall::RuleGroup'
+    Properties:
+      RuleGroupName: !Sub "icmp-alert-${AWS::StackName}"
+      Type: STATEFUL
+      Capacity: 100
+      RuleGroup:
+        RulesSource:
+          StatefulRules:
+            - Action: ALERT
+              Header:
+                Direction: ANY
+                Protocol: ICMP
+                Destination: ANY
+                Source: ANY
+                DestinationPort: ANY
+                SourcePort: ANY
+              RuleOptions:
+                - Keyword: "sid:1"
+      Tags:
+        - Key: Name
+          Value: !Sub "icmp-alert-${AWS::StackName}" 
+          
+  DomainAllowStatefulRuleGroup:
+    Type: 'AWS::NetworkFirewall::RuleGroup'
+    Properties:
+      RuleGroupName: !Sub "domain-allow-${AWS::StackName}"
+      Type: STATEFUL
+      Capacity: 100
+      RuleGroup:
+        RuleVariables:
+          IPSets:
+            HOME_NET:
+              Definition:
+                - "10.0.0.0/8"
+        RulesSource:
+          RulesSourceList:
+            TargetTypes:
+              - HTTP_HOST
+              - TLS_SNI
+            Targets: 
+              - ".amazon.com"
+            GeneratedRulesType: "ALLOWLIST"
+      Tags:
+        - Key: Name
+          Value: !Sub "domain-allow-${AWS::StackName}"   
+
+  InspectionFirewallPolicy:
+    Type: AWS::NetworkFirewall::FirewallPolicy
+    Properties:
+      FirewallPolicyName: !Sub "inspection-firewall-policy-${AWS::StackName}"
+      FirewallPolicy:
+        StatelessDefaultActions:
+          - 'aws:forward_to_sfe'
+        StatelessFragmentDefaultActions:
+          - 'aws:forward_to_sfe'
+        StatefulRuleGroupReferences:
+          - ResourceArn: !Ref ICMPAlertStatefulRuleGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "inspection-firewall-policy-${AWS::StackName}"
+
+  InspectionFirewall:
+    Type: AWS::NetworkFirewall::Firewall
+    Properties:
+      FirewallName: !Sub "inspection-firewall-${AWS::StackName}"
+      FirewallPolicyArn: !Ref InspectionFirewallPolicy
+      VpcId: !Ref VPC
+      SubnetMappings:
+        - SubnetId: !Ref ANFWeSubnetA
+        - SubnetId: !Ref ANFWeSubnetB
+        
+      Tags:
+        - Key: Name
+          Value: !Sub "inspection-firewall-${AWS::StackName}"
+
+  InspectionFirewallLogFlowGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/${AWS::StackName}/inspection-fw/flow"
+
+  InspectionFirewallLogAlertGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/${AWS::StackName}/inspection-fw/alert"
+    
+  InspectionFirewallLog:
+    Type: AWS::NetworkFirewall::LoggingConfiguration
+    Properties:
+      FirewallArn: !Ref InspectionFirewall
+      LoggingConfiguration:
+        LogDestinationConfigs:
+          - LogType: FLOW
+            LogDestinationType: CloudWatchLogs
+            LogDestination:
+              logGroup: !Sub "/${AWS::StackName}/inspection-fw/flow"
+          - LogType: ALERT
+            LogDestinationType: CloudWatchLogs
+            LogDestination:
+              logGroup: !Sub "/${AWS::StackName}/inspection-fw/alert"  
+
 
 ###############
 # VPC Outputs #
@@ -1023,17 +1106,17 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}"
 
-  GWLBeSubnetA:
+  ANFWeSubnetA:
     Description: PublicSubnetA
     Value: !Ref PublicSubnetA
     Export:
-      Name: !Sub "${AWS::StackName}-GWLBe-Subnet-A"
+      Name: !Sub "${AWS::StackName}-ANFWe-Subnet-A"
 
-  GWLBeSubnetB:
+  ANFWeSubnetB:
     Description: PublicSubnetB
     Value: !Ref PublicSubnetB
     Export:
-      Name: !Sub "${AWS::StackName}-GWLBe-Subnet-B"
+      Name: !Sub "${AWS::StackName}-ANFWe-Subnet-B"
 
   PublicSubnetA:
     Description: PublicSubnetA
@@ -1071,17 +1154,17 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-TGW-Subnet-B"
 
-  GWLBeSubnetARouteTable:
-    Description: GWLBeSubnetARouteTableID
-    Value: !Ref GWLBeSubnetARouteTable
+  ANFWeSubnetARouteTable:
+    Description: ANFWeSubnetARouteTableID
+    Value: !Ref ANFWeSubnetARouteTable
     Export:
-      Name: !Sub "${AWS::StackName}-GWLBeSubnetARouteTableID"
+      Name: !Sub "${AWS::StackName}-ANFWeSubnetARouteTableID"
 
-  GWLBeSubnetBRouteTable:
-    Description: GWLBeSubnetBRouteTableID
-    Value: !Ref GWLBeSubnetBRouteTable
+  ANFWeSubnetBRouteTable:
+    Description: ANFWeSubnetBRouteTableID
+    Value: !Ref ANFWeSubnetBRouteTable
     Export:
-      Name: !Sub "${AWS::StackName}-GWLBeSubnetBRouteTableID"
+      Name: !Sub "${AWS::StackName}-ANFWeSubnetBRouteTableID"
 
   PublicSubnetARouteTable:
     Description: PublicSubnetARouteTableID
