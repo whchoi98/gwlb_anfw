@@ -330,34 +330,34 @@ Resources:
 
   AddRouteIgwRouteTable1:
     Type: AWS::EC2::Route
-    DependsOn: ANFWVPCEndpointA
+    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetABlock
-      VpcEndpointId: !Select [1, !Split [":", !Select [0, !GetAtt InspectionFirewall.EndpointIds]]]
+      VpcEndpointId: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable2:
     Type: AWS::EC2::Route
-    DependsOn: ANFWVPCEndpointB
+    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetBBlock
-      VpcEndpointId: !Ref ANFWVPCEndpointB
+      VpcEndpointId: !Ref !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
       RouteTableId: !Ref IgwRouteTable    
 
   AddRouteIgwRouteTable3:
     Type: AWS::EC2::Route
-    DependsOn: ANFWVPCEndpointA
+    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetABlock
-      VpcEndpointId: !Select [1, !Split [":", !Select [0, !GetAtt InspectionFirewall.EndpointIds]]]
+      VpcEndpointId: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable4:
     Type: AWS::EC2::Route
-    DependsOn: ANFWVPCEndpointB
+    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetBBlock
-      VpcEndpointId: !Ref ANFWVPCEndpointB
+      VpcEndpointId: !Ref !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
       RouteTableId: !Ref IgwRouteTable    
 
 ################################################
@@ -426,12 +426,12 @@ Resources:
       RouteTableId: !Ref PublicSubnetARouteTable
 
   PublicRouteTableA1:
-    DependsOn: ANFWVPCEndpointA
+    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetARouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !Select [1, !Split [":", !Select [0, !GetAtt InspectionFirewall.EndpointIds]]]
+      VpcEndpointId: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
 
   PublicSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
@@ -448,12 +448,12 @@ Resources:
       RouteTableId: !Ref PublicSubnetBRouteTable
 
   PublicRouteTableB1:
-    DependsOn: ANFWVPCEndpointB
+    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetBRouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !Ref ANFWVPCEndpointB
+      VpcEndpointId: !Ref !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
 
 
 ################################################
