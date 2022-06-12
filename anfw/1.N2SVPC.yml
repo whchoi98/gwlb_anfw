@@ -147,10 +147,6 @@ Parameters:
     Default: 10.2.22.102
     Description: "VPC2 PrivateB Instance2 IP address"
 
-  VPCEndpointServiceName:
-    Type: String
-    Description: Check the name of the VPC Endpoint Service in the ANFW VPC. 
-
   InstanceType:
     Type: String
     Default: t3.small
