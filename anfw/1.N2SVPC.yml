@@ -330,7 +330,6 @@ Resources:
 
   AddRouteIgwRouteTable1:
     Type: AWS::EC2::Route
-    DependsOn: EgressFirewallVpceIds.FwVpceId1
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetABlock
       VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId1
@@ -338,7 +337,6 @@ Resources:
 
   AddRouteIgwRouteTable2:
     Type: AWS::EC2::Route
-    DependsOn: EgressFirewallVpceIds.FwVpceId2
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetBBlock
       VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId2
@@ -346,7 +344,6 @@ Resources:
 
   AddRouteIgwRouteTable3:
     Type: AWS::EC2::Route
-    DependsOn: EgressFirewallVpceIds.FwVpceId1
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetABlock
       VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId1
@@ -354,7 +351,6 @@ Resources:
 
   AddRouteIgwRouteTable4:
     Type: AWS::EC2::Route
-    DependsOn: EgressFirewallVpceIds.FwVpceId2
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetBBlock
       VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId2
@@ -426,7 +422,6 @@ Resources:
       RouteTableId: !Ref PublicSubnetARouteTable
 
   PublicRouteTableA1:
-    DependsOn: EgressFirewallVpceIds.FwVpceId1
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetARouteTable
@@ -448,7 +443,6 @@ Resources:
       RouteTableId: !Ref PublicSubnetBRouteTable
 
   PublicRouteTableB1:
-    DependsOn: EgressFirewallVpceIds.FwVpceId2
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetBRouteTable
