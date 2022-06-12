@@ -330,34 +330,34 @@ Resources:
 
   AddRouteIgwRouteTable1:
     Type: AWS::EC2::Route
-    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+    DependsOn: EgressFirewallVpceIds.FwVpceId1
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetABlock
-      VpcEndpointId: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+      VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId1
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable2:
     Type: AWS::EC2::Route
-    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+    DependsOn: EgressFirewallVpceIds.FwVpceId2
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetBBlock
-      VpcEndpointId: !Ref !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+      VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId2
       RouteTableId: !Ref IgwRouteTable    
 
   AddRouteIgwRouteTable3:
     Type: AWS::EC2::Route
-    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+    DependsOn: EgressFirewallVpceIds.FwVpceId1
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetABlock
-      VpcEndpointId: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+      VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId1
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable4:
     Type: AWS::EC2::Route
-    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+    DependsOn: EgressFirewallVpceIds.FwVpceId2
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetBBlock
-      VpcEndpointId: !Ref !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+      VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId2
       RouteTableId: !Ref IgwRouteTable    
 
 ################################################
@@ -426,12 +426,12 @@ Resources:
       RouteTableId: !Ref PublicSubnetARouteTable
 
   PublicRouteTableA1:
-    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+    DependsOn: EgressFirewallVpceIds.FwVpceId1
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetARouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'a:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+      VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId1
 
   PublicSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
@@ -448,12 +448,12 @@ Resources:
       RouteTableId: !Ref PublicSubnetBRouteTable
 
   PublicRouteTableB1:
-    DependsOn: !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+    DependsOn: EgressFirewallVpceIds.FwVpceId2
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PublicSubnetBRouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !Ref !Select [ 0, !Split [ ',', !Select [ 1 , !Split [ 'c:', !Join [ ',', !GetAtt NetworkFW.EndpointIds ] ] ] ] ]
+      VpcEndpointId: !Ref EgressFirewallVpceIds.FwVpceId2
 
 
 ################################################
@@ -1090,7 +1090,104 @@ Resources:
             LogDestinationType: CloudWatchLogs
             LogDestination:
               logGroup: !Sub "/${AWS::StackName}/inspection-fw/alert"  
+###############################################
+# Firewall Endpoint Id Retrieval Lambda Role:
+###############################################
 
+  FwLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-${AWS::Region}-nfw-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt RetrieveVpcIdLogGroup.Arn
+              - Effect: Allow
+                Action:
+                  - network-firewall:DescribeFirewall
+                Resource: "*"
+
+# Retrieve VpceId Lambda Custom Resource:
+  RetrieveVpcIdLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+        LogGroupName: !Sub /aws/lambda/${AWS::StackName}-retrieve-vpceid
+        RetentionInDays: 1
+
+  RetrieveVpceId:
+    Type: AWS::Lambda::Function
+    DependsOn: RetrieveVpcIdLogGroup
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-retrieve-vpceid
+      Handler: "index.handler"
+      Role: !GetAtt
+        - FwLambdaExecutionRole
+        - Arn
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import json
+          import logging
+          def handler(event, context):
+              logger = logging.getLogger()
+              logger.setLevel(logging.INFO)
+              responseData = {}
+              responseStatus = cfnresponse.FAILED
+              logger.info('Received event: {}'.format(json.dumps(event)))
+              if event["RequestType"] == "Delete":
+                  responseStatus = cfnresponse.SUCCESS
+                  cfnresponse.send(event, context, responseStatus, responseData)
+              if event["RequestType"] == "Create":
+                  try:
+                      Az1 = event["ResourceProperties"]["Az1"]
+                      Az2 = event["ResourceProperties"]["Az2"]
+                      FwArn = event["ResourceProperties"]["FwArn"]
+                  except Exception as e:
+                      logger.info('AZ retrieval failure: {}'.format(e))
+                  try:
+                      nfw = boto3.client('network-firewall')
+                  except Exception as e:
+                      logger.info('boto3.client failure: {}'.format(e))
+                  try:
+                      NfwResponse=nfw.describe_firewall(FirewallArn=FwArn)
+                      VpceId1 = NfwResponse['FirewallStatus']['SyncStates'][Az1]['Attachment']['EndpointId']
+                      VpceId2 = NfwResponse['FirewallStatus']['SyncStates'][Az2]['Attachment']['EndpointId']
+                  except Exception as e:
+                      logger.info('ec2.describe_firewall failure: {}'.format(e))
+                  responseData['FwVpceId1'] = VpceId1
+                  responseData['FwVpceId2'] = VpceId2
+                  responseStatus = cfnresponse.SUCCESS
+                  cfnresponse.send(event, context, responseStatus, responseData)
+      Runtime: python3.7
+      Timeout: 30
+############################
+# EgressFirewallVpceIds.FwVpceId1 , EgressFirewallVpceIds.FwVpceId2
+############################
+
+  EgressFirewallVpceIds:
+    Type: Custom::DescribeVpcEndpoints
+    Properties:
+      ServiceToken: !GetAtt RetrieveVpceId.Arn
+      Az1: !Ref AvailabilityZone1Selection
+      Az2: !Ref AvailabilityZone2Selection
+      FwArn: !Ref EgressFirewall
 
 ###############
 # VPC Outputs #
