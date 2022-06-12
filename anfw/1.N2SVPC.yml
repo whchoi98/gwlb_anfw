@@ -1021,28 +1021,28 @@ Resources:
         - Key: Name
           Value: !Sub "ALLPERMIT-${AWS::StackName}" 
 
-#  ICMPAlertStatefulRuleGroup:
-#    Type: 'AWS::NetworkFirewall::RuleGroup'
-#    Properties:
-#      RuleGroupName: !Sub "icmp-alert-${AWS::StackName}"
-#      Type: STATEFUL
-#      Capacity: 100
-#      RuleGroup:
-#        RulesSource:
-#          StatefulRules:
-#            - Action: ALERT
-#              Header:
-#                Direction: ANY
-#                Protocol: ICMP
-#                Destination: ANY
-#                Source: ANY
-#                DestinationPort: ANY
-#                SourcePort: ANY
-#              RuleOptions:
-#                - Keyword: "sid:2"#
-#      Tags:
-#        - Key: Name
-#          Value: !Sub "icmp-alert-${AWS::StackName}" 
+  ICMPAlertStatefulRuleGroup:
+    Type: 'AWS::NetworkFirewall::RuleGroup'
+    Properties:
+      RuleGroupName: !Sub "icmp-alert-${AWS::StackName}"
+      Type: STATEFUL
+      Capacity: 100
+      RuleGroup:
+        RulesSource:
+          StatefulRules:
+            - Action: ALERT
+              Header:
+                Direction: ANY
+                Protocol: ICMP
+                Destination: ANY
+                Source: ANY
+                DestinationPort: ANY
+                SourcePort: ANY
+              RuleOptions:
+                - Keyword: "sid:2"
+      Tags:
+        - Key: Name
+          Value: !Sub "icmp-alert-${AWS::StackName}" 
 
   DomainAllowStatefulRuleGroup:
     Type: 'AWS::NetworkFirewall::RuleGroup'
@@ -1080,7 +1080,7 @@ Resources:
         StatefulRuleGroupReferences:
           - ResourceArn: !Ref DomainAllowStatefulRuleGroup
           - ResourceArn: !Ref ALLPERMITStatefulRuleGroup
-#         - ResourceArn: !Ref ICMPAlertStatefulRuleGroup
+          - ResourceArn: !Ref ICMPAlertStatefulRuleGroup
       Tags:
         - Key: Name
           Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
