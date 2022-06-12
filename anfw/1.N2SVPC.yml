@@ -333,7 +333,7 @@ Resources:
     DependsOn: ANFWVPCEndpointA
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetABlock
-      VpcEndpointId: !Ref ANFWVPCEndpointA
+      VpcEndpointId: !Select [1, !Split [":", !Select [0, !GetAtt InspectionFirewall.EndpointIds]]]
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable2:
@@ -349,7 +349,7 @@ Resources:
     DependsOn: ANFWVPCEndpointA
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetABlock
-      VpcEndpointId: !Ref ANFWVPCEndpointA
+      VpcEndpointId: !Select [1, !Split [":", !Select [0, !GetAtt InspectionFirewall.EndpointIds]]]
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable4:
@@ -431,7 +431,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicSubnetARouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !Ref ANFWVPCEndpointA
+      VpcEndpointId: !Select [1, !Split [":", !Select [0, !GetAtt InspectionFirewall.EndpointIds]]]
 
   PublicSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
