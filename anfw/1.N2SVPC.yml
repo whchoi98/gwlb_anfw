@@ -1007,10 +1007,10 @@ Resources:
       RuleGroup:
         RulesSource:
           StatefulRules:
-            - Action: Pass
+            - Action: PASS
               Header:
                 Direction: ANY
-                Protocol: TCP
+                Protocol: IP
                 Destination: ANY
                 Source: ANY
                 DestinationPort: ANY
