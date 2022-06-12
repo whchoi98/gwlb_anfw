@@ -1031,59 +1031,60 @@ Resources:
         - Key: Name
           Value: !Sub "domain-allow-${AWS::StackName}"   
 
-  InspectionFirewallPolicy:
+  EgressFirewallPolicy:
     Type: AWS::NetworkFirewall::FirewallPolicy
     Properties:
-      FirewallPolicyName: !Sub "inspection-firewall-policy-${AWS::StackName}"
+      FirewallPolicyName: !Sub "egress-firewall-policy-${AWS::StackName}"
       FirewallPolicy:
         StatelessDefaultActions:
           - 'aws:forward_to_sfe'
         StatelessFragmentDefaultActions:
           - 'aws:forward_to_sfe'
         StatefulRuleGroupReferences:
+          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
           - ResourceArn: !Ref ICMPAlertStatefulRuleGroup
       Tags:
         - Key: Name
-          Value: !Sub "inspection-firewall-policy-${AWS::StackName}"
+          Value: !Sub "egress-firewall-policy-${AWS::StackName}"
 
-  InspectionFirewall:
+  EgressFirewall:
     Type: AWS::NetworkFirewall::Firewall
     Properties:
-      FirewallName: !Sub "inspection-firewall-${AWS::StackName}"
-      FirewallPolicyArn: !Ref InspectionFirewallPolicy
+      FirewallName: !Sub "egress-firewall-${AWS::StackName}"
+      FirewallPolicyArn: !Ref EgressFirewallPolicy
       VpcId: !Ref VPC
       SubnetMappings:
         - SubnetId: !Ref ANFWeSubnetA
         - SubnetId: !Ref ANFWeSubnetB
-        
       Tags:
         - Key: Name
-          Value: !Sub "inspection-firewall-${AWS::StackName}"
+          Value: !Sub "egress-firewall-${AWS::StackName}"
 
-  InspectionFirewallLogFlowGroup:
+  EgressFirewallLogFlowGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/${AWS::StackName}/inspection-fw/flow"
+      LogGroupName: !Sub "/${AWS::StackName}/egress-fw/flow"
 
-  InspectionFirewallLogAlertGroup:
+  EgressFirewallLogAlertGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/${AWS::StackName}/inspection-fw/alert"
-    
-  InspectionFirewallLog:
+      LogGroupName: !Sub "/${AWS::StackName}/egress-fw/alert"
+      
+  EgressFirewallLog:
     Type: AWS::NetworkFirewall::LoggingConfiguration
     Properties:
-      FirewallArn: !Ref InspectionFirewall
+      FirewallArn: !Ref EgressFirewall
       LoggingConfiguration:
         LogDestinationConfigs:
           - LogType: FLOW
             LogDestinationType: CloudWatchLogs
             LogDestination:
-              logGroup: !Sub "/${AWS::StackName}/inspection-fw/flow"
+              logGroup: !Sub "/${AWS::StackName}/egress-fw/flow"
           - LogType: ALERT
             LogDestinationType: CloudWatchLogs
             LogDestination:
-              logGroup: !Sub "/${AWS::StackName}/inspection-fw/alert"  
+              logGroup: !Sub "/${AWS::StackName}/egress-fw/alert"
+
 ###############################################
 # Firewall Endpoint Id Retrieval Lambda Role:
 ###############################################
