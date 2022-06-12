@@ -1179,8 +1179,8 @@ Resources:
     Type: Custom::DescribeVpcEndpoints
     Properties:
       ServiceToken: !GetAtt RetrieveVpceId.Arn
-      Az1: !Ref AvailabilityZone1Selection
-      Az2: !Ref AvailabilityZone2Selection
+      Az1: !Ref AvailabilityZoneA
+      Az2: !Ref AvailabilityZoneB
       FwArn: !Ref EgressFirewall
 
 ###############
