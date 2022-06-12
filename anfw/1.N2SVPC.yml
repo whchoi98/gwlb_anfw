@@ -1010,7 +1010,7 @@ Resources:
             - Action: Pass
               Header:
                 Direction: ANY
-                Protocol: IP
+                Protocol: TCP
                 Destination: ANY
                 Source: ANY
                 DestinationPort: ANY
