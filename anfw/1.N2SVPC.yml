@@ -1001,7 +1001,7 @@ Resources:
   ALLPERMITStatefulRuleGroup:
     Type: 'AWS::NetworkFirewall::RuleGroup'
     Properties:
-      RuleGroupName: !Sub "ALLPERMIT-${AWS::StackName}"
+      RuleGroupName: !Sub "allpermit-${AWS::StackName}"
       Type: STATEFUL
       Capacity: 100
       RuleGroup:
