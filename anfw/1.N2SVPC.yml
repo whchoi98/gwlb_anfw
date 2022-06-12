@@ -298,6 +298,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Public-Subnet-A'
+        - Key: kubernetes.io/role/elb
+          Value: 1
 
   PublicSubnetB:
     Type: AWS::EC2::Subnet
@@ -309,7 +311,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Public-Subnet-B'
-
+        - Key: kubernetes.io/role/elb
+          Value: 1
 ################################################
 # Create-RouteTable: VPC IGW Ingress Route     #
 ################################################
@@ -332,28 +335,28 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetABlock
-      VpcEndpointId: !GetAtt EgressFirewallVpceIds.FwVpceId1
+      VpcEndpointId: !GetAtt N2SFirewallVpceIds.FwVpceId1
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable2:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref PublicSubnetBBlock
-      VpcEndpointId: !GetAtt EgressFirewallVpceIds.FwVpceId2
+      VpcEndpointId: !GetAtt N2SFirewallVpceIds.FwVpceId2
       RouteTableId: !Ref IgwRouteTable    
 
   AddRouteIgwRouteTable3:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetABlock
-      VpcEndpointId: !GetAtt EgressFirewallVpceIds.FwVpceId1
+      VpcEndpointId: !GetAtt N2SFirewallVpceIds.FwVpceId1
       RouteTableId: !Ref IgwRouteTable
 
   AddRouteIgwRouteTable4:
     Type: AWS::EC2::Route
     Properties:
       DestinationCidrBlock: !Ref ANFWeSubnetBBlock
-      VpcEndpointId: !GetAtt EgressFirewallVpceIds.FwVpceId2
+      VpcEndpointId: !GetAtt N2SFirewallVpceIds.FwVpceId2
       RouteTableId: !Ref IgwRouteTable    
 
 ################################################
@@ -426,7 +429,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicSubnetARouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !GetAtt EgressFirewallVpceIds.FwVpceId1
+      VpcEndpointId: !GetAtt N2SFirewallVpceIds.FwVpceId1
 
   PublicSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
@@ -447,7 +450,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicSubnetBRouteTable
       DestinationCidrBlock: !Ref DefaultRouteBlock
-      VpcEndpointId: !GetAtt EgressFirewallVpceIds.FwVpceId2
+      VpcEndpointId: !GetAtt N2SFirewallVpceIds.FwVpceId2
 
 
 ################################################
@@ -489,7 +492,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Private-Subnet-A'
-
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
 
   PrivateSubnetARouteTable:
     Type: AWS::EC2::RouteTable
@@ -525,7 +529,9 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Private-Subnet-B'
-  
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
+
   PrivateSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -688,7 +694,15 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-SSMSG'
-
+########################################################
+# Create-Security-Group : ControlPlane
+########################################################
+  ControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster communication with worker nodes
+      VpcId: !Ref VPC
+      
 ##############################################
 # Create-Private-EC2: VPC Private EC2 Create #
 ##############################################
@@ -984,6 +998,29 @@ Resources:
 #Firewall
 ###############
 
+  ALLPERMITStatefulRuleGroup:
+    Type: 'AWS::NetworkFirewall::RuleGroup'
+    Properties:
+      RuleGroupName: !Sub "ALLPERMIT-${AWS::StackName}"
+      Type: STATEFUL
+      Capacity: 100
+      RuleGroup:
+        RulesSource:
+          StatefulRules:
+            - Action: Pass
+              Header:
+                Direction: ANY
+                Protocol: IP
+                Destination: ANY
+                Source: ANY
+                DestinationPort: ANY
+                SourcePort: ANY
+              RuleOptions:
+                - Keyword: "sid:1"
+      Tags:
+        - Key: Name
+          Value: !Sub "ALLPERMIT-${AWS::StackName}" 
+
   ICMPAlertStatefulRuleGroup:
     Type: 'AWS::NetworkFirewall::RuleGroup'
     Properties:
@@ -1002,11 +1039,12 @@ Resources:
                 DestinationPort: ANY
                 SourcePort: ANY
               RuleOptions:
-                - Keyword: "sid:1"
+                - Keyword: "sid:2"
+
       Tags:
         - Key: Name
           Value: !Sub "icmp-alert-${AWS::StackName}" 
-          
+
   DomainAllowStatefulRuleGroup:
     Type: 'AWS::NetworkFirewall::RuleGroup'
     Properties:
@@ -1031,10 +1069,10 @@ Resources:
         - Key: Name
           Value: !Sub "domain-allow-${AWS::StackName}"   
 
-  EgressFirewallPolicy:
+  N2SFirewallPolicy:
     Type: AWS::NetworkFirewall::FirewallPolicy
     Properties:
-      FirewallPolicyName: !Sub "egress-firewall-policy-${AWS::StackName}"
+      FirewallPolicyName: !Sub "N2S-firewall-policy-${AWS::StackName}"
       FirewallPolicy:
         StatelessDefaultActions:
           - 'aws:forward_to_sfe'
@@ -1045,45 +1083,45 @@ Resources:
           - ResourceArn: !Ref ICMPAlertStatefulRuleGroup
       Tags:
         - Key: Name
-          Value: !Sub "egress-firewall-policy-${AWS::StackName}"
+          Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
 
-  EgressFirewall:
+  N2SFirewall:
     Type: AWS::NetworkFirewall::Firewall
     Properties:
-      FirewallName: !Sub "egress-firewall-${AWS::StackName}"
-      FirewallPolicyArn: !Ref EgressFirewallPolicy
+      FirewallName: !Sub "N2S-firewall-${AWS::StackName}"
+      FirewallPolicyArn: !Ref N2SFirewallPolicy
       VpcId: !Ref VPC
       SubnetMappings:
         - SubnetId: !Ref ANFWeSubnetA
         - SubnetId: !Ref ANFWeSubnetB
       Tags:
         - Key: Name
-          Value: !Sub "egress-firewall-${AWS::StackName}"
+          Value: !Sub "N2S-firewall-${AWS::StackName}"
 
-  EgressFirewallLogFlowGroup:
+  N2SFirewallLogFlowGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/${AWS::StackName}/egress-fw/flow"
+      LogGroupName: !Sub "/${AWS::StackName}/N2S-fw/flow"
 
-  EgressFirewallLogAlertGroup:
+  N2SFirewallLogAlertGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/${AWS::StackName}/egress-fw/alert"
+      LogGroupName: !Sub "/${AWS::StackName}/N2S-fw/alert"
       
-  EgressFirewallLog:
+  N2SFirewallLog:
     Type: AWS::NetworkFirewall::LoggingConfiguration
     Properties:
-      FirewallArn: !Ref EgressFirewall
+      FirewallArn: !Ref N2SFirewall
       LoggingConfiguration:
         LogDestinationConfigs:
           - LogType: FLOW
             LogDestinationType: CloudWatchLogs
             LogDestination:
-              logGroup: !Sub "/${AWS::StackName}/egress-fw/flow"
+              logGroup: !Sub "/${AWS::StackName}/N2S-fw/flow"
           - LogType: ALERT
             LogDestinationType: CloudWatchLogs
             LogDestination:
-              logGroup: !Sub "/${AWS::StackName}/egress-fw/alert"
+              logGroup: !Sub "/${AWS::StackName}/N2S-fw/alert"
 
 ###############################################
 # Firewall Endpoint Id Retrieval Lambda Role:
@@ -1173,16 +1211,16 @@ Resources:
       Runtime: python3.7
       Timeout: 30
 ############################
-# EgressFirewallVpceIds.FwVpceId1 , EgressFirewallVpceIds.FwVpceId2
+# N2SFirewallVpceIds.FwVpceId1 , N2SFirewallVpceIds.FwVpceId2
 ############################
 
-  EgressFirewallVpceIds:
+  N2SFirewallVpceIds:
     Type: Custom::DescribeVpcEndpoints
     Properties:
       ServiceToken: !GetAtt RetrieveVpceId.Arn
       Az1: !Ref AvailabilityZoneA
       Az2: !Ref AvailabilityZoneB
-      FwArn: !Ref EgressFirewall
+      FwArn: !Ref N2SFirewall
 
 ###############
 # VPC Outputs #
@@ -1283,3 +1321,7 @@ Outputs:
     Value: !Ref ALBSecurityGroup
     Export:
       Name: !Sub "${AWS::StackName}-ALBSecurityGroup"
+      
+  SecurityGroups:
+    Description: Security group for the cluster control plane communication with worker nodes
+    Value: !Join [ ",", [ !Ref ControlPlaneSecurityGroup ] ]
