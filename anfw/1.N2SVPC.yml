@@ -1021,30 +1021,6 @@ Resources:
         - Key: Name
           Value: !Sub "ALLPERMIT-${AWS::StackName}" 
 
-  ICMPAlertStatefulRuleGroup:
-    Type: 'AWS::NetworkFirewall::RuleGroup'
-    Properties:
-      RuleGroupName: !Sub "icmp-alert-${AWS::StackName}"
-      Type: STATEFUL
-      Capacity: 100
-      RuleGroup:
-        RulesSource:
-          StatefulRules:
-            - Action: ALERT
-              Header:
-                Direction: ANY
-                Protocol: ICMP
-                Destination: ANY
-                Source: ANY
-                DestinationPort: ANY
-                SourcePort: ANY
-              RuleOptions:
-                - Keyword: "sid:2"
-
-      Tags:
-        - Key: Name
-          Value: !Sub "icmp-alert-${AWS::StackName}" 
-
   DomainAllowStatefulRuleGroup:
     Type: 'AWS::NetworkFirewall::RuleGroup'
     Properties:
@@ -1321,7 +1297,7 @@ Outputs:
     Value: !Ref ALBSecurityGroup
     Export:
       Name: !Sub "${AWS::StackName}-ALBSecurityGroup"
-      
+
   SecurityGroups:
     Description: Security group for the cluster control plane communication with worker nodes
     Value: !Join [ ",", [ !Ref ControlPlaneSecurityGroup ] ]
