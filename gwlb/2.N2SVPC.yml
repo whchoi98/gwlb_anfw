@@ -302,6 +302,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Public-Subnet-A'
+        - Key: kubernetes.io/role/elb
+          Value: 1
 
   PublicSubnetB:
     Type: AWS::EC2::Subnet
@@ -313,7 +315,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Public-Subnet-B'
-
+        - Key: kubernetes.io/role/elb
+          Value: 1
 ################################################
 # Create-RouteTable: VPC IGW Ingress Route     #
 ################################################
@@ -499,7 +502,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Private-Subnet-A'
-
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
 
   PrivateSubnetARouteTable:
     Type: AWS::EC2::RouteTable
@@ -535,7 +539,8 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Private-Subnet-B'
-  
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1  
   PrivateSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -1012,6 +1017,14 @@ Resources:
         - Id: !Ref PrivateBInstance2
           Port: 80
 
+########################################################
+# Create-Security-Group : ControlPlane
+########################################################
+  ControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster communication with worker nodes
+      VpcId: !Ref VPC
 
 ###############
 # VPC Outputs #
