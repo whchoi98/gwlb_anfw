@@ -81,40 +81,40 @@ Resources:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
       SubnetIds:
-        - Fn::ImportValue: !Sub "N2SVPC-TGW-Subnet-A"
-        - Fn::ImportValue: !Sub "N2SVPC-TGW-Subnet-B"
+        - Fn::ImportValue: !Sub "ANFW-N2SVPC-TGW-Subnet-A"
+        - Fn::ImportValue: !Sub "ANFW-N2SVPC-TGW-Subnet-B"
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Attach-N2SVPC'
       TransitGatewayId: !Ref TransitGatewayGWLB
       VpcId:
-        Fn::ImportValue: !Sub "N2SVPC"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC"
 
   TransitGatewayAttachmentVPC01:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
       SubnetIds:
-        - Fn::ImportValue: !Sub "VPC01-TGW-Subnet-A"
-        - Fn::ImportValue: !Sub "VPC01-TGW-Subnet-B"
+        - Fn::ImportValue: !Sub "ANFW-VPC01-TGW-Subnet-A"
+        - Fn::ImportValue: !Sub "ANFW-VPC01-TGW-Subnet-B"
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Attach-VPC01'
       TransitGatewayId: !Ref TransitGatewayGWLB
       VpcId:
-        Fn::ImportValue: !Sub "VPC01"
+        Fn::ImportValue: !Sub "ANFW-VPC01"
 
   TransitGatewayAttachmentVPC02:
     Type: "AWS::EC2::TransitGatewayAttachment"
     Properties:
       SubnetIds:
-        - Fn::ImportValue: !Sub "VPC02-TGW-Subnet-A"
-        - Fn::ImportValue: !Sub "VPC02-TGW-Subnet-B"
+        - Fn::ImportValue: !Sub "ANFW-VPC02-TGW-Subnet-A"
+        - Fn::ImportValue: !Sub "ANFW-VPC02-TGW-Subnet-B"
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Attach-VPC02'
       TransitGatewayId: !Ref TransitGatewayGWLB
       VpcId:
-        Fn::ImportValue: !Sub "VPC02"
+        Fn::ImportValue: !Sub "ANFW-VPC02"
 
 #  TransitGatewayAttachmentVPC03:
 #    Type: "AWS::EC2::TransitGatewayAttachment"
@@ -192,7 +192,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC01CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PrivateSubnetARouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PrivateSubnetARouteTableID"
 
   N2SVPCAZAAddRoute2:
     DependsOn:
@@ -203,7 +203,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC02CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PrivateSubnetARouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PrivateSubnetARouteTableID"
 
   N2SVPCAZAAddRoute3:
     DependsOn:
@@ -214,7 +214,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC01CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PublicSubnetARouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PublicSubnetARouteTableID"
 
   N2SVPCAZAAddRoute4:
     DependsOn:
@@ -225,7 +225,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC02CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PublicSubnetARouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PublicSubnetARouteTableID"
 #  N2SVPCAZAAddRoute3:
 #    DependsOn:
 #      - TransitGatewayGWLB
@@ -246,7 +246,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC01CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PrivateSubnetBRouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PrivateSubnetBRouteTableID"
 
   N2SVPCAZBAddRoute2:
     DependsOn:
@@ -257,7 +257,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC02CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PrivateSubnetBRouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PrivateSubnetBRouteTableID"
 
   N2SVPCAZBAddRoute3:
     DependsOn:
@@ -268,7 +268,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC01CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PublicSubnetBRouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PublicSubnetBRouteTableID"
 
   N2SVPCAZBAddRoute4:
     DependsOn:
@@ -279,7 +279,7 @@ Resources:
       DestinationCidrBlock: !Ref VPC02CIDRBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId: 
-        Fn::ImportValue: !Sub "N2SVPC-PublicSubnetBRouteTableID"
+        Fn::ImportValue: !Sub "ANFW-N2SVPC-PublicSubnetBRouteTableID"
 
 #  N2SVPCAZBAddRoute3:
 #    DependsOn:
@@ -302,7 +302,7 @@ Resources:
       DestinationCidrBlock: !Ref DefaultRouteBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId:  
-        Fn::ImportValue: !Sub "VPC01-PrivateSubnetARouteTableID"
+        Fn::ImportValue: !Sub "ANFW-VPC01-PrivateSubnetARouteTableID"
 
   VPC01AZBAddRoute1:
     DependsOn:
@@ -313,7 +313,7 @@ Resources:
       DestinationCidrBlock: !Ref DefaultRouteBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId:  
-        Fn::ImportValue: !Sub "VPC01-PrivateSubnetBRouteTableID"
+        Fn::ImportValue: !Sub "ANFW-VPC01-PrivateSubnetBRouteTableID"
 
 ### VPC02 route table configuration
   VPC02AZAAddRoute1:
@@ -325,7 +325,7 @@ Resources:
       DestinationCidrBlock: !Ref DefaultRouteBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId:  
-        Fn::ImportValue: !Sub "VPC02-PrivateSubnetARouteTableID"
+        Fn::ImportValue: !Sub "ANFW-VPC02-PrivateSubnetARouteTableID"
 
   VPC02AZBAddRoute1:
     DependsOn:
@@ -336,7 +336,7 @@ Resources:
       DestinationCidrBlock: !Ref DefaultRouteBlock
       TransitGatewayId: !Ref TransitGatewayGWLB
       RouteTableId:  
-        Fn::ImportValue: !Sub "VPC02-PrivateSubnetBRouteTableID"
+        Fn::ImportValue: !Sub "ANFW-VPC02-PrivateSubnetBRouteTableID"
 
 ### VPC03 route table configuration
 #  VPC03AZAAddRoute1:
