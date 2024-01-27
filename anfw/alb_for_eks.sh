@@ -9,6 +9,8 @@ export ANFW_N2SVPC_PublicSubnet02_NAME=ANFW-N2SVPC-Public-Subnet-B
 export ANFW_N2SVPC_ALBSG_NAME=ANFW-N2SVPC-ALBSecurityGroup
 export ALB_FOR_EKS_NAME=ALB-FOR-EKS
 export ALB_FOR_EKS_TG=EKS-TG
+export NLB_PRIVATE_A_IP=10.1.21.201
+export NLB_PRIVATE_B_IP=10.1.22.201
 echo "export ANFW_N2SVPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=$ANFW_N2SVPC_NAME" | jq -r '.Vpcs[].VpcId')" | tee -a ~/.bash_profile
 echo "export ANFW_N2SVPC_PublicSubnet01=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=${ANFW_N2SVPC_PublicSubnet01_NAME}" | jq -r '.Subnets[].SubnetId')" | tee -a ~/.bash_profile
 echo "export ANFW_N2SVPC_PublicSubnet02=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=${ANFW_N2SVPC_PublicSubnet02_NAME}" | jq -r '.Subnets[].SubnetId')" | tee -a ~/.bash_profile
@@ -47,7 +49,7 @@ echo "register-targets - ALB for EKS Workload"
 echo "-------------"
 aws elbv2 register-targets \
     --target-group-arn ${ALB_FOR_EKS_TG_ARN} \
-    --targets Id=10.11.21.101 Id=10.11.21.102 Id=10.11.22.101 Id=10.11.22.102
+    --targets Id=${NLB_PRIVATE_A_IP} Id=${NLB_PRIVATE_B_IP}
 
 echo "-------------"
 echo "create-listener - ALB for EKS Workload"
