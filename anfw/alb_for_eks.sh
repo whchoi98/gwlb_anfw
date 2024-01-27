@@ -1,0 +1,58 @@
+#!bin/bash
+#create-load0-balancer
+echo "-------------"
+echo "Create - environment variable"
+echo "-------------"
+export ANFW_N2SVPC_NAME=ANFW-N2SVPC
+export ANFW_N2SVPC_PublicSubnet01_NAME=ANFW-N2SVPC-Public-Subnet-A
+export ANFW_N2SVPC_PublicSubnet02_NAME=ANFW-N2SVPC-Public-Subnet-B
+export ANFW_N2SVPC_ALBSG_NAME=ANFW-N2SVPC-ALBSecurityGroup
+export ALB_FOR_EKS_NAME=ALB-FOR-EKS
+export ALB_FOR_EKS_TG=EKS-TG
+echo "export ANFW_N2SVPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=$ANFW_N2SVPC_NAME" | jq -r '.Vpcs[].VpcId')" | tee -a ~/.bash_profile
+echo "export ANFW_N2SVPC_PublicSubnet01=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=${ANFW_N2SVPC_PublicSubnet01_NAME}" | jq -r '.Subnets[].SubnetId')" | tee -a ~/.bash_profile
+echo "export ANFW_N2SVPC_PublicSubnet02=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=${ANFW_N2SVPC_PublicSubnet02_NAME}" | jq -r '.Subnets[].SubnetId')" | tee -a ~/.bash_profile
+echo "export ANFW_N2SVPC_ALBSG=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=${ANFW_N2SVPC_ALBSG_NAME}" | jq -r '.SecurityGroups[].GroupId')" | tee -a ~/.bash_profile
+
+echo "-------------"
+echo "Create - ALB for EKS Workload"
+echo "-------------"
+aws elbv2 create-load-balancer --name ${ALB_FOR_EKS_NAME} \
+--subnets ${ANFW_N2SVPC_PublicSubnet01} ${ANFW_N2SVPC_PublicSubnet02} \
+--security-groups ${ANFW_N2SVPC_ALBSG}
+
+#sleep 120
+
+echo "-------------"
+echo "Status check - ALB for EKS Workload"
+echo "-------------"
+aws elbv2 describe-load-balancers  --name ${ALB_FOR_EKS_NAME}  | jq -r '.LoadBalancers[].State'
+echo "export ALB_FOR_EKS_ARN=$(aws elbv2 describe-load-balancers  --name ${ALB_FOR_EKS_NAME} | jq -r '.LoadBalancers[].LoadBalancerArn')" | tee -a ~/.bash_profile
+source ~/.bash_profile
+
+echo "-------------"
+echo "create-target-group - ALB for EKS Workload"
+echo "-------------"
+aws elbv2 create-target-group --name ${ALB_FOR_EKS_TG} \
+--protocol HTTP --port 80 \
+--target-type ip \
+--vpc-id ${ANFW_N2SVPC_ID}
+
+
+echo "export ALB_FOR_EKS_TG_ARN=$(aws elbv2 describe-target-groups --name ${ALB_FOR_EKS_TG} | jq -r '.TargetGroups[].TargetGroupArn')" | tee -a ~/.bash_profile
+source ~/.bash_profile
+
+echo "-------------"
+echo "register-targets - ALB for EKS Workload"
+echo "-------------"
+aws elbv2 register-targets \
+    --target-group-arn ${ALB_FOR_EKS_TG_ARN} \
+    --targets Id=10.11.21.101 Id=10.11.21.102 Id=10.11.22.101 Id=10.11.22.102
+
+echo "-------------"
+echo "create-listener - ALB for EKS Workload"
+echo "-------------"
+aws elbv2 create-listener --load-balancer-arn $ALB_FOR_EKS_ARN --protocol HTTP --port 80  \
+--default-actions Type=forward,TargetGroupArn=${ALB_FOR_EKS_TG_ARN}
+
+aws elbv2 describe-load-balancers  --name ${ALB_FOR_EKS_NAME} | jq -r '.LoadBalancers[].DNSName'
