@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 #create-load0-balancer
 echo "-------------"
 echo "Create - environment variable"
