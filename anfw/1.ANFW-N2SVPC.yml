@@ -1208,7 +1208,7 @@ Resources:
                   responseData['FwVpceId2'] = VpceId2
                   responseStatus = cfnresponse.SUCCESS
                   cfnresponse.send(event, context, responseStatus, responseData)
-      Runtime: python3.7
+      Runtime: python3.12
       Timeout: 30
 ############################
 # N2SFirewallVpceIds.FwVpceId1 , N2SFirewallVpceIds.FwVpceId2

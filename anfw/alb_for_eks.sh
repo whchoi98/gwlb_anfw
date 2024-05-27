@@ -61,6 +61,9 @@ source ~/.bash_profile
 echo "-------------"
 echo "EKS-Sample-APP-URL ADDRESS"
 echo "-------------"
+echo "export EKS_Sample_APP_URL=$(aws elbv2 describe-load-balancers  --name ${ALB_FOR_EKS_NAME} | jq -r '.LoadBalancers[].DNSName')" | tee -a ~/.bash_profile
+source ~/.bash_profile
+
 echo "EKS-Sample-APP-URL = http://$(aws elbv2 describe-load-balancers  --name ${ALB_FOR_EKS_NAME} | jq -r '.LoadBalancers[].DNSName')"
 
 ###How to delete elbv2###

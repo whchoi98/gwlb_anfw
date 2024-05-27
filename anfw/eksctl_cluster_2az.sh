@@ -2,13 +2,14 @@
 export VPC01_NAME=ANFW-VPC01
 export eksctl_filename=ekscluster01.yaml
 export EKS_VERSION="1.25"
-export CLUSTER1_NAME="C1"
 #Valuse="Subnet's Name tag's Value"
 #export AWS_REGION=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
 export AWS_REGION=ap-northeast-2
+export CLUSTER1_NAME="C1"
 export ACCOUNT_ID=$(aws sts get-caller-identity --region ${AWS_REGION} --output text --query Account)
 echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bash_profile
 echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bash_profile
+echo "export CLUSTER1_NAME=${CLUSTER1_NAME}" | tee -a ~/.bash_profile
 export NODE_INSTANCE_TYPE=m5.xlarge
 export public_mgmd_node="managed-frontend-workloads"
 export private_mgmd_node="managed-backend-workloads"
