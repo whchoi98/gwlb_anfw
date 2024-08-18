@@ -28,27 +28,27 @@ Parameters:
 
   VPCCIDRBlock:
     Type: String
-    Default: 10.1.0.0/16
+    Default: 10.2.0.0/16
     Description: "The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range."
 
   PrivateSubnetABlock:
     Type: String
-    Default: 10.1.21.0/24
+    Default: 10.2.21.0/24
     Description: "CidrBlock for AZ A private subnet A within the VPC"
 
   PrivateSubnetBBlock:
     Type: String
-    Default: 10.1.22.0/24
+    Default: 10.2.22.0/24
     Description: "CidrBlock for AZ B private subnet B within the VPC"
   
   TGWSubnetABlock:
     Type: String
-    Default: 10.1.251.0/24
+    Default: 10.2.251.0/24
     Description: "CidrBlock for AZ A TGW subnet A within the VPC"
 
   TGWSubnetBBlock:
     Type: String
-    Default: 10.1.252.0/24
+    Default: 10.2.252.0/24
     Description: "CidrBlock for AZ A TGW subnet A within the VPC"
 
   InstanceType:
@@ -305,7 +305,7 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnetA
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.1.21.101
+      PrivateIpAddress: 10.2.21.101
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
@@ -320,7 +320,7 @@ Resources:
             DeleteOnTermination: true
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Private-A-10.1.21.101'
+          Value: !Sub '${AWS::StackName}-Private-A-10.2.21.101'
       UserData:
         Fn::Base64:
           Fn::Sub: |
@@ -349,7 +349,7 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnetA
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.1.21.102
+      PrivateIpAddress: 10.2.21.102
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
@@ -364,7 +364,7 @@ Resources:
             DeleteOnTermination: true
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Private-A-10.1.21.102'
+          Value: !Sub '${AWS::StackName}-Private-A-10.2.21.102'
       UserData:
         Fn::Base64:
           Fn::Sub: |
@@ -393,7 +393,7 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnetB
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.1.22.101
+      PrivateIpAddress: 10.2.22.101
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
@@ -408,7 +408,7 @@ Resources:
             DeleteOnTermination: true
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Private-B-10.1.22.101'
+          Value: !Sub '${AWS::StackName}-Private-B-10.2.22.101'
       UserData:
         Fn::Base64:
           Fn::Sub: |
@@ -425,6 +425,10 @@ Resources:
             cd /var/www/html/;
             sudo git clone https://github.com/whchoi98/ec2meta-webpage.git;
             sudo systemctl restart httpd;
+            git clone https://github.com/gcla/termshark.git;
+            cd ~/termshark/;
+            go get github.com/gcla/termshark/v2/cmd/termshark;
+            cd ~;
             exit
 
   PrivateBInstanace2:
@@ -433,7 +437,7 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnetB
       ImageId: !Ref LatestAmiId
-      PrivateIpAddress: 10.1.22.102
+      PrivateIpAddress: 10.2.22.102
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
@@ -448,7 +452,7 @@ Resources:
             DeleteOnTermination: true
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-Private-B-10.1.22.102'
+          Value: !Sub '${AWS::StackName}-Private-B-10.2.22.102'
       UserData:
         Fn::Base64:
           Fn::Sub: |
@@ -465,6 +469,10 @@ Resources:
             cd /var/www/html/;
             sudo git clone https://github.com/whchoi98/ec2meta-webpage.git;
             sudo systemctl restart httpd;
+            git clone https://github.com/gcla/termshark.git;
+            cd ~/termshark/;
+            go get github.com/gcla/termshark/v2/cmd/termshark;
+            cd ~;
             exit
 
 ######################################################################
@@ -511,7 +519,7 @@ Outputs:
     Description: PrivateSubnetA
     Value: !Ref PrivateSubnetA
     Export:
-      Name: !Sub "${AWS::StackName}-PrivateSubnet-A"
+      Name: !Sub "${AWS::StackName}-Private-Subnet-A"
 
   PrivateSubnetBBlock:
     Description: PrivateSubnetB
