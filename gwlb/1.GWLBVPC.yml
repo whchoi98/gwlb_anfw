@@ -26,7 +26,7 @@ Parameters:
   AvailabilityZoneB:
     Description: "Choose AZ2 for your VPC."
     Type: AWS::EC2::AvailabilityZone::Name
-    Default: "ap-northeast-2c"
+    Default: "ap-northeast-2b"
 
   VPCCIDRBlock:
     Type: String
@@ -52,10 +52,10 @@ Parameters:
 # Create-Keypair : EC2 Keypair #
 ################################
 
-  KeyPair:
-    Description: "Keypair to access the EC2 Instance"
-    Type: "AWS::EC2::KeyPair::KeyName"
-    Default: "Your KeyPair"
+#  KeyPair:
+#    Description: "Keypair to access the EC2 Instance"
+#    Type: "AWS::EC2::KeyPair::KeyName"
+#    Default: "Your KeyPair"
 
 ##########################
 # Create-AMI: EC2 AMI ID #
@@ -307,7 +307,7 @@ Resources:
         - Ref: ApplianceEC2SG
       ImageId: !Ref LatestAmiId
       InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref ApplianceProfile
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -342,6 +342,7 @@ Resources:
             export instance_ip=$(cat /home/ec2-user/iid |grep 'privateIp' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export instance_region=$(cat /home/ec2-user/iid |grep 'region' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export gwlb_ip=$(aws --region $instance_region ec2 describe-network-interfaces --filters Name=vpc-id,Values=$instance_vpcid | jq ' .NetworkInterfaces[] | select(.AvailabilityZone=='$instance_az') | select(.InterfaceType=="gateway_load_balancer") |.PrivateIpAddress' -r)
+            echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf
   
             # Webpage configuration
             sudo systemctl start httpd
@@ -390,7 +391,7 @@ Resources:
         - Ref: ApplianceEC2SG
       ImageId: !Ref LatestAmiId
       InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref ApplianceProfile
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -425,6 +426,7 @@ Resources:
             export instance_ip=$(cat /home/ec2-user/iid |grep 'privateIp' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export instance_region=$(cat /home/ec2-user/iid |grep 'region' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export gwlb_ip=$(aws --region $instance_region ec2 describe-network-interfaces --filters Name=vpc-id,Values=$instance_vpcid | jq ' .NetworkInterfaces[] | select(.AvailabilityZone=='$instance_az') | select(.InterfaceType=="gateway_load_balancer") |.PrivateIpAddress' -r)
+            echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf
   
             # Webpage configuration
             sudo systemctl start httpd
@@ -473,7 +475,7 @@ Resources:
         - Ref: ApplianceEC2SG
       ImageId: !Ref LatestAmiId
       InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref ApplianceProfile
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -508,6 +510,7 @@ Resources:
             export instance_ip=$(cat /home/ec2-user/iid |grep 'privateIp' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export instance_region=$(cat /home/ec2-user/iid |grep 'region' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export gwlb_ip=$(aws --region $instance_region ec2 describe-network-interfaces --filters Name=vpc-id,Values=$instance_vpcid | jq ' .NetworkInterfaces[] | select(.AvailabilityZone=='$instance_az') | select(.InterfaceType=="gateway_load_balancer") |.PrivateIpAddress' -r)
+            echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf
   
             # Webpage configuration
             sudo systemctl start httpd
@@ -556,7 +559,7 @@ Resources:
         - Ref: ApplianceEC2SG
       ImageId: !Ref LatestAmiId      
       InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref ApplianceProfile
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -591,6 +594,7 @@ Resources:
             export instance_ip=$(cat /home/ec2-user/iid |grep 'privateIp' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export instance_region=$(cat /home/ec2-user/iid |grep 'region' | awk -F': ' '{print $2}' | awk -F',' '{print $1}' | awk -F'"' '{print$2}')
             export gwlb_ip=$(aws --region $instance_region ec2 describe-network-interfaces --filters Name=vpc-id,Values=$instance_vpcid | jq ' .NetworkInterfaces[] | select(.AvailabilityZone=='$instance_az') | select(.InterfaceType=="gateway_load_balancer") |.PrivateIpAddress' -r)
+            echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf
   
             # Webpage configuration
             sudo systemctl start httpd
@@ -674,4 +678,3 @@ Outputs:
     Value: !GetAtt ApplianceInstance4.PublicIp
     Export:
       Name: !Sub "${AWS::StackName}-Appliance4Ip"
-
