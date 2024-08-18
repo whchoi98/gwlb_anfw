@@ -24,7 +24,7 @@ Parameters:
   AvailabilityZoneB:
     Description: "Choose AZ2 for your VPC."
     Type: AWS::EC2::AvailabilityZone::Name
-    Default: "ap-northeast-2c"
+    Default: "ap-northeast-2b"
 
   VPCCIDRBlock:
     Type: String
@@ -60,10 +60,10 @@ Parameters:
 # Create-Keypair : EC2 Keypair #
 ################################
 
-  KeyPair:
-    Description: "Keypair to access the EC2 Instance"
-    Type: "AWS::EC2::KeyPair::KeyName"
-    Default: "Your KeyPair"
+#  KeyPair:
+#    Description: "Keypair to access the EC2 Instance"
+#    Type: "AWS::EC2::KeyPair::KeyName"
+#    Default: "Your KeyPair"
 
 ##########################
 # Create-AMI: EC2 AMI ID #
@@ -110,8 +110,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-PrivateSubnetA'
-        - Key: kubernetes.io/role/internal-elb
-          Value: 1
 
   PrivateSubnetB:
     Type: AWS::EC2::Subnet
@@ -123,8 +121,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-PrivateSubnetB'
-        - Key: kubernetes.io/role/internal-elb
-          Value: 1
 
 #####################################################################
 # Create-Private-RouteTable: Create VPC_Private_RouteTable_a,b #
@@ -313,7 +309,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -357,7 +353,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -401,7 +397,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -445,7 +441,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
