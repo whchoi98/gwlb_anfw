@@ -1037,7 +1037,7 @@ StrictModeStatefulRuleGroup:
               Destination: ANY
               DestinationPort: ANY
             RuleOptions:
-              - Keyword: "sid:4"
+              - Keyword: "sid:100"
     Tags:
       - Key: Name
         Value: !Sub "strictmode-${AWS::StackName}"
@@ -1076,8 +1076,8 @@ N2SFirewallPolicy:
       StatelessFragmentDefaultActions:
         - 'aws:forward_to_sfe'
       StatefulRuleGroupReferences:
-        - ResourceArn: !Ref DomainAllowStatefulRuleGroup
-        - ResourceArn: !Ref StrictModeStatefulRuleGroup
+        - ResourceArn: !GetAtt DomainAllowStatefulRuleGroup.Arn
+        - ResourceArn: !GetAtt StrictModeStatefulRuleGroup.Arn
     Tags:
       - Key: Name
         Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
