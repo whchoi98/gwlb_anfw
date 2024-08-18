@@ -110,8 +110,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-PrivateSubnetA'
-        - Key: kubernetes.io/role/internal-elb
-          Value: 1
 
   PrivateSubnetB:
     Type: AWS::EC2::Subnet
@@ -123,8 +121,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-PrivateSubnetB'
-        - Key: kubernetes.io/role/internal-elb
-          Value: 1
 
 #####################################################################
 # Create-Private-RouteTable: Create VPC_Private_RouteTable_a,b #
@@ -313,7 +309,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -357,7 +353,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -401,7 +397,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -441,7 +437,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
