@@ -21,7 +21,7 @@ Metadata:
          - VPC1CIDRBlock
          - VPC2CIDRBlock
          - VPC3CIDRBlock
-         - VPCEndpointServiceName
+         - VPCEndpointServiceName4
          - InstanceType
          - VPC01-PrivateAInstance1
          - VPC01-PrivateAInstance2
@@ -45,7 +45,7 @@ Parameters:
   AvailabilityZoneB:
     Description: "Choose AZ2 for your VPC."
     Type: AWS::EC2::AvailabilityZone::Name
-    Default: "ap-northeast-2c"
+    Default: "ap-northeast-2b"
 
   VPCCIDRBlock:
     Type: String
@@ -147,7 +147,7 @@ Parameters:
     Default: 10.2.22.102
     Description: "VPC2 PrivateB Instance2 IP address"
 
-  VPCEndpointServiceName:
+  VPCEndpointServiceName4:
     Type: String
     Description: Check the name of the VPC Endpoint Service in the GWLB VPC. 
 
@@ -160,10 +160,10 @@ Parameters:
 # Create-Keypair : EC2 Keypair #
 ################################
 
-  KeyPair:
-    Description: "Keypair to access the EC2 Instance"
-    Type: "AWS::EC2::KeyPair::KeyName"
-    Default: "Your KeyPair"
+#  KeyPair:
+#    Description: "Keypair to access the EC2 Instance"
+#    Type: "AWS::EC2::KeyPair::KeyName"
+#    Default: "Your KeyPair"
 
 ##########################
 # Create-AMI: EC2 AMI ID #
@@ -302,8 +302,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Public-Subnet-A'
-        - Key: kubernetes.io/role/elb
-          Value: 1
 
   PublicSubnetB:
     Type: AWS::EC2::Subnet
@@ -315,8 +313,7 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Public-Subnet-B'
-        - Key: kubernetes.io/role/elb
-          Value: 1
+
 ################################################
 # Create-RouteTable: VPC IGW Ingress Route     #
 ################################################
@@ -502,8 +499,7 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Private-Subnet-A'
-        - Key: kubernetes.io/role/internal-elb
-          Value: 1
+
 
   PrivateSubnetARouteTable:
     Type: AWS::EC2::RouteTable
@@ -539,8 +535,7 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-Private-Subnet-B'
-        - Key: kubernetes.io/role/internal-elb
-          Value: 1  
+  
   PrivateSubnetBRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -643,7 +638,7 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref VPC
-      ServiceName: !Ref VPCEndpointServiceName
+      ServiceName: !Ref VPCEndpointServiceName4
       VpcEndpointType: GatewayLoadBalancer
       SubnetIds:
         - !Ref GWLBeSubnetA
@@ -652,7 +647,7 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       VpcId: !Ref VPC
-      ServiceName: !Ref VPCEndpointServiceName
+      ServiceName: !Ref VPCEndpointServiceName4
       VpcEndpointType: GatewayLoadBalancer
       SubnetIds:
         - !Ref GWLBeSubnetB
@@ -740,7 +735,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -780,7 +775,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -820,7 +815,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -860,7 +855,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      KeyName: !Ref KeyPair
+#      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -1017,14 +1012,6 @@ Resources:
         - Id: !Ref PrivateBInstance2
           Port: 80
 
-########################################################
-# Create-Security-Group : ControlPlane
-########################################################
-  ControlPlaneSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Cluster communication with worker nodes
-      VpcId: !Ref VPC
 
 ###############
 # VPC Outputs #
