@@ -52,3 +52,5 @@ echo "export N2SVPC_21_101=${N2SVPC_21_101}"| tee -a ~/.bash_profile
 echo "export N2SVPC_21_102=${N2SVPC_21_102}"| tee -a ~/.bash_profile
 echo "export N2SVPC_22_101=${N2SVPC_22_101}"| tee -a ~/.bash_profile
 echo "export N2SVPC_22_102=${N2SVPC_22_102}"| tee -a ~/.bash_profile
+
+source ~/.bash_profile
