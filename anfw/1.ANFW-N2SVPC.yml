@@ -1038,7 +1038,7 @@ Resources:
                 Destination: ANY
                 DestinationPort: ANY
               RuleOptions:
-                - Keyword: "sid:4"
+                - Keyword: "sid:100"
       Tags:
         - Key: Name
           Value: !Sub "STRICTMODE-${AWS::StackName}"
