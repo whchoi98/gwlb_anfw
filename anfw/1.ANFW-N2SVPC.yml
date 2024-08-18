@@ -1079,6 +1079,8 @@ Resources:
         StatefulRuleGroupReferences:
           - ResourceArn: !Ref DomainAllowStatefulRuleGroup
           - ResourceArn: !Ref StrictModeStatefulRuleGroup
+        StatefulEngineOptions:
+          RuleOrder: STRICT_ORDER
       Tags:
         - Key: Name
           Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
