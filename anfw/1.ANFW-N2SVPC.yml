@@ -1096,29 +1096,29 @@ Resources:
         - Key: Name
           Value: !Sub "STRICTMODE-${AWS::StackName}"
           
-  DomainAllowStatefulRuleGroup:
-    Type: 'AWS::NetworkFirewall::RuleGroup'
-    Properties:
-      RuleGroupName: !Sub "domain-allow-${AWS::StackName}"
-      Type: STATEFUL
-      Capacity: 100
-      RuleGroup:
-        RuleVariables:
-          IPSets:
-            HOME_NET:
-              Definition:
-                - "10.0.0.0/8"
-        RulesSource:
-          RulesSourceList:
-            TargetTypes:
-              - HTTP_HOST
-              - TLS_SNI
-            Targets: 
-              - ".amazon.com"
-            GeneratedRulesType: "ALLOWLIST"
-      Tags:
-        - Key: Name
-          Value: !Sub "domain-allow-${AWS::StackName}"
+#  DomainAllowStatefulRuleGroup:
+#    Type: 'AWS::NetworkFirewall::RuleGroup'
+#    Properties:
+#      RuleGroupName: !Sub "domain-allow-${AWS::StackName}"
+#      Type: STATEFUL
+#      Capacity: 100
+#      RuleGroup:
+#        RuleVariables:
+#          IPSets:
+#            HOME_NET:
+#              Definition:
+#                - "10.0.0.0/8"
+#        RulesSource:
+#          RulesSourceList:
+#            TargetTypes:
+#              - HTTP_HOST
+#              - TLS_SNI
+#            Targets: 
+#              - ".amazon.com"
+#            GeneratedRulesType: "ALLOWLIST"
+#      Tags:
+#        - Key: Name
+#          Value: !Sub "domain-allow-${AWS::StackName}"
 
   N2SFirewallPolicy:
     Type: AWS::NetworkFirewall::FirewallPolicy
@@ -1138,20 +1138,20 @@ Resources:
         - Key: Name
           Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
   
-  N2SDomainAllowFirewallPolicy:
-    Type: AWS::NetworkFirewall::FirewallPolicy
-    Properties:
-      FirewallPolicyName: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
-      FirewallPolicy:
-        StatelessDefaultActions:
-          - 'aws:forward_to_sfe'
-        StatelessFragmentDefaultActions:
-          - 'aws:forward_to_sfe'
-        StatefulRuleGroupReferences:
-          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
-      Tags:
-        - Key: Name
-          Value: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
+#  N2SDomainAllowFirewallPolicy:
+#    Type: AWS::NetworkFirewall::FirewallPolicy
+#    Properties:
+#      FirewallPolicyName: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
+#      FirewallPolicy:
+#        StatelessDefaultActions:
+#          - 'aws:forward_to_sfe'
+#        StatelessFragmentDefaultActions:
+#          - 'aws:forward_to_sfe'
+#        StatefulRuleGroupReferences:
+#          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
+#      Tags:
+#        - Key: Name
+#          Value: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
 
   N2SFirewall:
     Type: AWS::NetworkFirewall::Firewall
