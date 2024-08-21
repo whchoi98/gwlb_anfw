@@ -1131,7 +1131,7 @@ Resources:
           - 'aws:forward_to_sfe'
         StatefulRuleGroupReferences:
           - ResourceArn: !Ref StrictModeStatefulRuleGroup
-          - Priority: 1
+            Priority: 1
         StatefulEngineOptions:
           RuleOrder: STRICT_ORDER
       Tags:
