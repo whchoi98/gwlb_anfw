@@ -717,7 +717,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+      #      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -757,7 +757,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+      #      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -797,7 +797,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+      #      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -837,7 +837,7 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroupIds: 
         - Ref: PrivateEC2SG
-      #KeyName: !Ref KeyPair
+      #      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref InstanceProfileSSM
       BlockDeviceMappings: 
         - DeviceName: /dev/xvda
@@ -998,55 +998,33 @@ Resources:
 #Firewall
 ###############
 
-#  ALLPERMITStatefulRuleGroup:
-#    Type: 'AWS::NetworkFirewall::RuleGroup'
-#    Properties:
-#      RuleGroupName: !Sub "allpermit-${AWS::StackName}"
-#      Type: STATEFUL
-#      Capacity: 100
-#      RuleGroup:
-#        RulesSource:
-#          StatefulRules:
-#            - Action: PASS
-#              Header:
-#                Direction: ANY
-#                Protocol: IP
-#                Destination: ANY
-#                Source: ANY
-#                DestinationPort: ANY
-#                SourcePort: ANY
-#              RuleOptions:
-#                - Keyword: "sid:1"
-#      Tags:
-#        - Key: Name
-#          Value: !Sub "ALLPERMIT-${AWS::StackName}" 
-#  ICMPAlertStatefulRuleGroup:
-#    Type: 'AWS::NetworkFirewall::RuleGroup'
-#    Properties:
-#      RuleGroupName: !Sub "icmp-alert-${AWS::StackName}"
-#      Type: STATEFUL
-#      Capacity: 100
-#      RuleGroup:
-#        RulesSource:
-#          StatefulRules:
-#            - Action: ALERT
-#              Header:
-#                Direction: ANY
-#                Protocol: ICMP
-#                Destination: ANY
-#                Source: ANY
-#                DestinationPort: ANY
-#                SourcePort: ANY
-#              RuleOptions:
-#                - Keyword: "sid:2"
-#      Tags:
-#        - Key: Name
-#          Value: !Sub "icmp-alert-${AWS::StackName}" 
-#
-  StrictModeStatefulRuleGroup:
+  ALLPERMITStatefulRuleGroup:
     Type: 'AWS::NetworkFirewall::RuleGroup'
     Properties:
-      RuleGroupName: !Sub "strictmode-${AWS::StackName}"
+      RuleGroupName: !Sub "allpermit-${AWS::StackName}"
+      Type: STATEFUL
+      Capacity: 100
+      RuleGroup:
+        RulesSource:
+          StatefulRules:
+            - Action: PASS
+              Header:
+                Direction: ANY
+                Protocol: IP
+                Destination: ANY
+                Source: ANY
+                DestinationPort: ANY
+                SourcePort: ANY
+              RuleOptions:
+                - Keyword: "sid:1"
+      Tags:
+        - Key: Name
+          Value: !Sub "ALLPERMIT-${AWS::StackName}" 
+
+  ICMPAlertStatefulRuleGroup:
+    Type: 'AWS::NetworkFirewall::RuleGroup'
+    Properties:
+      RuleGroupName: !Sub "icmp-alert-${AWS::StackName}"
       Type: STATEFUL
       Capacity: 100
       RuleGroup:
@@ -1054,71 +1032,41 @@ Resources:
           StatefulRules:
             - Action: ALERT
               Header:
-                Protocol: TCP
-                Source: ANY
-                SourcePort: ANY
                 Direction: ANY
+                Protocol: ICMP
                 Destination: ANY
-                DestinationPort: 80
-              RuleOptions:
-                - Keyword: "sid:1"
-            - Action: ALERT
-              Header:
-                Protocol: TCP
                 Source: ANY
+                DestinationPort: ANY
                 SourcePort: ANY
-                Direction: ANY
-                Destination: ANY
-                DestinationPort: 443
               RuleOptions:
                 - Keyword: "sid:2"
-            - Action: ALERT
-              Header:
-                Protocol: ICMP
-                Source: ANY
-                SourcePort: ANY
-                Direction: ANY
-                Destination: ANY
-                DestinationPort: ANY
-              RuleOptions:
-                - Keyword: "sid:3"
-            - Action: DROP
-              Header:
-                Protocol: IP
-                Source: ANY
-                SourcePort: ANY
-                Direction: ANY
-                Destination: ANY
-                DestinationPort: ANY
-              RuleOptions:
-                - Keyword: "sid:100"
       Tags:
         - Key: Name
-          Value: !Sub "STRICTMODE-${AWS::StackName}"
-          
-#  DomainAllowStatefulRuleGroup:
-#    Type: 'AWS::NetworkFirewall::RuleGroup'
-#    Properties:
-#      RuleGroupName: !Sub "domain-allow-${AWS::StackName}"
-#      Type: STATEFUL
-#      Capacity: 100
-#      RuleGroup:
-#        RuleVariables:
-#          IPSets:
-#            HOME_NET:
-#              Definition:
-#                - "10.0.0.0/8"
-#        RulesSource:
-#          RulesSourceList:
-#            TargetTypes:
-#              - HTTP_HOST
-#              - TLS_SNI
-#            Targets: 
-#              - ".amazon.com"
-#            GeneratedRulesType: "ALLOWLIST"
-#      Tags:
-#        - Key: Name
-#          Value: !Sub "domain-allow-${AWS::StackName}"
+          Value: !Sub "icmp-alert-${AWS::StackName}" 
+
+  DomainAllowStatefulRuleGroup:
+    Type: 'AWS::NetworkFirewall::RuleGroup'
+    Properties:
+      RuleGroupName: !Sub "domain-allow-${AWS::StackName}"
+      Type: STATEFUL
+      Capacity: 100
+      RuleGroup:
+        RuleVariables:
+          IPSets:
+            HOME_NET:
+              Definition:
+                - "10.0.0.0/8"
+        RulesSource:
+          RulesSourceList:
+            TargetTypes:
+              - HTTP_HOST
+              - TLS_SNI
+            Targets: 
+              - ".amazon.com"
+            GeneratedRulesType: "ALLOWLIST"
+      Tags:
+        - Key: Name
+          Value: !Sub "domain-allow-${AWS::StackName}"   
 
   N2SFirewallPolicy:
     Type: AWS::NetworkFirewall::FirewallPolicy
@@ -1130,28 +1078,12 @@ Resources:
         StatelessFragmentDefaultActions:
           - 'aws:forward_to_sfe'
         StatefulRuleGroupReferences:
-          - ResourceArn: !Ref StrictModeStatefulRuleGroup
-          - Priority: 1
-        StatefulEngineOptions:
-          RuleOrder: STRICT_ORDER
+          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
+          - ResourceArn: !Ref ALLPERMITStatefulRuleGroup
+          - ResourceArn: !Ref ICMPAlertStatefulRuleGroup
       Tags:
         - Key: Name
           Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
-  
-#  N2SDomainAllowFirewallPolicy:
-#    Type: AWS::NetworkFirewall::FirewallPolicy
-#    Properties:
-#      FirewallPolicyName: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
-#      FirewallPolicy:
-#        StatelessDefaultActions:
-#          - 'aws:forward_to_sfe'
-#        StatelessFragmentDefaultActions:
-#          - 'aws:forward_to_sfe'
-#        StatefulRuleGroupReferences:
-#          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
-#      Tags:
-#        - Key: Name
-#          Value: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
 
   N2SFirewall:
     Type: AWS::NetworkFirewall::Firewall
@@ -1165,7 +1097,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "N2S-firewall-${AWS::StackName}"
-
 
   N2SFirewallLogFlowGroup:
     Type: AWS::Logs::LogGroup
