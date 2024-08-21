@@ -1097,29 +1097,6 @@ Resources:
           Value: !Sub "STRICTMODE-${AWS::StackName}"
           
   DomainAllowStatefulRuleGroup:
-    Type: 'AWS::NetworkFirewall::RuleGroup'
-    Properties:
-      RuleGroupName: !Sub "domain-allow-${AWS::StackName}"
-      Type: STATEFUL
-      Capacity: 100
-      RuleGroup:
-        RuleVariables:
-          IPSets:
-            HOME_NET:
-              Definition:
-                - "10.0.0.0/8"
-        RulesSource:
-          RulesSourceList:
-            TargetTypes:
-              - HTTP_HOST
-              - TLS_SNI
-            Targets: 
-              - ".amazon.com"
-            GeneratedRulesType: "ALLOWLIST"
-      Tags:
-        - Key: Name
-          Value: !Sub "domain-allow-${AWS::StackName}"   
-  DomainAllowStatefulRuleGroup:
   Type: 'AWS::NetworkFirewall::RuleGroup'
   Properties:
     RuleGroupName: !Sub "domain-allow-${AWS::StackName}"
