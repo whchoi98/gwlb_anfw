@@ -1120,36 +1120,6 @@ Resources:
       - Key: Name
         Value: !Sub "domain-allow-${AWS::StackName}"   
 
-N2SFirewallPolicy:
-  Type: AWS::NetworkFirewall::FirewallPolicy
-  Properties:
-    FirewallPolicyName: !Sub "N2S-firewall-policy-${AWS::StackName}"
-    FirewallPolicy:
-      StatelessDefaultActions:
-        - 'aws:forward_to_sfe'
-      StatelessFragmentDefaultActions:
-        - 'aws:forward_to_sfe'
-      StatefulRuleGroupReferences:
-        - ResourceArn: !Ref DomainAllowStatefulRuleGroup
-        - ResourceArn: !Ref StrictModeStatefulRuleGroup
-      StatefulEngineOptions:
-        RuleOrder: STRICT_ORDER
-    Tags:
-      - Key: Name
-        Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
-      
-N2SFirewall:
-  Type: AWS::NetworkFirewall::Firewall
-  Properties:
-    FirewallName: !Sub "N2S-firewall-${AWS::StackName}"
-    FirewallPolicyArn: !Ref N2SFirewallPolicy
-    VpcId: !Ref VPC
-    SubnetMappings:
-      - SubnetId: !Ref ANFWeSubnetA
-      - SubnetId: !Ref ANFWeSubnetB
-    Tags:
-      - Key: Name
-        Value: !Sub "N2S-firewall-${AWS::StackName}"
   N2SFirewallPolicy:
     Type: AWS::NetworkFirewall::FirewallPolicy
     Properties:
@@ -1166,6 +1136,20 @@ N2SFirewall:
       Tags:
         - Key: Name
           Value: !Sub "N2S-firewall-policy-${AWS::StackName}"
+               
+  N2SFirewall:
+    Type: AWS::NetworkFirewall::Firewall
+    Properties:
+      FirewallName: !Sub "N2S-firewall-${AWS::StackName}"
+      FirewallPolicyArn: !Ref N2SFirewallPolicy
+      VpcId: !Ref VPC
+      SubnetMappings:
+        - SubnetId: !Ref ANFWeSubnetA
+        - SubnetId: !Ref ANFWeSubnetB
+      Tags:
+        - Key: Name
+          Value: !Sub "N2S-firewall-${AWS::StackName}"
+
 
   N2SFirewallLogFlowGroup:
     Type: AWS::Logs::LogGroup
