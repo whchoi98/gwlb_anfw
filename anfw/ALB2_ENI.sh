@@ -3,21 +3,13 @@
 # ALB 이름 설정
 ALB_NAME="ALB-VPC02"
 
-# ENI ID 가져오기
-ENI_ID=$(aws ec2 describe-network-interfaces --filters "Name=description,Values=*${ALB_NAME}*" --query "NetworkInterfaces[*].NetworkInterfaceId" --output text)
+# ALB의 ARN 가져오기
+ALB_ARN=$(aws elbv2 describe-load-balancers --names $ALB_NAME --query "LoadBalancers[0].LoadBalancerArn" --output text)
 
-# ENI ID가 유효한지 확인
-if [ -z "$ENI_ID" ]; then
-  echo "Error: ENI ID를 찾을 수 없습니다. ALB 이름을 확인하세요."
-  exit 1
-fi
+# ALB에 연결된 ENI 목록 가져오기
+ALB_VPC02_ENI_IDS=$(aws elbv2 describe-load-balancers --load-balancer-arns $ALB_ARN --query "LoadBalancers[0].AvailabilityZones[].LoadBalancerAddresses[].NetworkInterfaceId" --output text)
 
-# ENI에 연결된 IP 주소 가져오기
-ENI_IP=$(aws ec2 describe-network-interfaces --network-interface-ids $ENI_ID --query "NetworkInterfaces[*].PrivateIpAddresses[*].PrivateIpAddress" --output text)
-
-# IP 주소 출력
-if [ -z "$ENI_IP" ]; then
-  echo "Error: ENI IP 주소를 찾을 수 없습니다."
-else
-  echo "ALB(${ALB_NAME})의 ENI IP 주소: $ENI_IP"
-fi
+# ENI IP 주소 가져오기
+for ENI_ID in $ALB_VPC02_ENI_IDS; do
+  aws ec2 describe-network-interfaces --network-interface-ids $ENI_ID --query "NetworkInterfaces[0].PrivateIpAddresses[].PrivateIpAddress" --output text
+done
