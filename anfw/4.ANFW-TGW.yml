@@ -1133,7 +1133,6 @@ Resources:
 #          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
 #            Priority: 1
           - ResourceArn: !Ref StrictModeStatefulRuleGroup
-            Priority: 1
         StatefulEngineOptions:
           RuleOrder: STRICT_ORDER
       Tags:
