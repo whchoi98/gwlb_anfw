@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ALB 이름 설정
-ALB_NAME="ALB-02"
+ALB_NAME="ALB-VPC02"
 
 # ENI ID 가져오기
 ENI_ID=$(aws ec2 describe-network-interfaces --filters "Name=description,Values=*${ALB_NAME}*" --query "NetworkInterfaces[*].NetworkInterfaceId" --output text)
