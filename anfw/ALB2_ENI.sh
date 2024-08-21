@@ -10,6 +10,14 @@ ALB_ARN=$(aws elbv2 describe-load-balancers --names $ALB_NAME --query "LoadBalan
 ALB_VPC02_ENI_IDS=$(aws elbv2 describe-load-balancers --load-balancer-arns $ALB_ARN --query "LoadBalancers[0].AvailabilityZones[].LoadBalancerAddresses[].NetworkInterfaceId" --output text)
 
 # ENI IP 주소 가져오기
+ENI_IPS=()
 for ENI_ID in $ALB_VPC02_ENI_IDS; do
-  aws ec2 describe-network-interfaces --network-interface-ids $ENI_ID --query "NetworkInterfaces[0].PrivateIpAddresses[].PrivateIpAddress" --output text
+  IP_ADDRESS=$(aws ec2 describe-network-interfaces --network-interface-ids $ENI_ID --query "NetworkInterfaces[0].PrivateIpAddresses[0].PrivateIpAddress" --output text)
+  ENI_IPS+=($IP_ADDRESS)
+done
+
+# 결과 출력
+echo "ENI IP addresses associated with ALB $ALB_NAME:"
+for IP in "${ENI_IPS[@]}"; do
+  echo $IP
 done
