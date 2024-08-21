@@ -1118,7 +1118,22 @@ Resources:
             GeneratedRulesType: "ALLOWLIST"
       Tags:
         - Key: Name
-          Value: !Sub "domain-allow-${AWS::StackName}"   
+          Value: !Sub "domain-allow-${AWS::StackName}"
+             
+  N2SDomainAllowFirewallPolicy:
+    Type: AWS::NetworkFirewall::FirewallPolicy
+    Properties:
+      FirewallPolicyName: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
+      FirewallPolicy:
+        StatelessDefaultActions:
+          - 'aws:forward_to_sfe'
+        StatelessFragmentDefaultActions:
+          - 'aws:forward_to_sfe'
+        StatefulRuleGroupReferences:
+          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "N2S-domain-allow-firewall-policy-${AWS::StackName}"
 
   N2SFirewallPolicy:
     Type: AWS::NetworkFirewall::FirewallPolicy
@@ -1130,10 +1145,8 @@ Resources:
         StatelessFragmentDefaultActions:
           - 'aws:forward_to_sfe'
         StatefulRuleGroupReferences:
-          - ResourceArn: !Ref DomainAllowStatefulRuleGroup
-            Priority: 1
           - ResourceArn: !Ref StrictModeStatefulRuleGroup
-            Priority: 2
+            Priority: 1
         StatefulEngineOptions:
           RuleOrder: STRICT_ORDER
       Tags:
