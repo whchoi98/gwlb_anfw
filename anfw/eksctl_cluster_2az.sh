@@ -29,7 +29,7 @@ echo "export C1_PrivateSubnet02=$(aws ec2 describe-subnets --filters 'Name=tag:N
 
 source ~/.bash_profile
 
-cat << EOF > ~/environment/${eksctl_filename}
+cat << EOF > ~/${eksctl_filename}
 ---
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
@@ -94,7 +94,7 @@ managedNodeGroups:
 
 EOF
 
-cd ~/environment/
+cd ~/
 source ~/.bash_profile
 eksctl create cluster -f ${eksctl_filename} --dry-run
 
