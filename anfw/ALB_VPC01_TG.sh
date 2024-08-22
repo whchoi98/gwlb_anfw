@@ -1,50 +1,43 @@
 #!/bin/bash
 
 # Variables
-ALB_NAME="ALB-VPC01"
-VPC_NAME="ANFW-N2SVPC"
-SUBNET_A_NAME="ANFW-N2SVPC-Public-Subnet-A"
-SUBNET_B_NAME="ANFW-N2SVPC-Public-Subnet-B"
-SECURITY_GROUP_NAME="ALBSecurityGroup"
 TARGET_GROUP_NAME="ANFW-VPC01-TG"
-TAG_KEY="Name"
-TAG_VALUE="ALB-VPC01"
+VPC_NAME="ANFW-N2SVPC"
+PROTOCOL="HTTP"
+PORT=80
+HEALTH_CHECK_PROTOCOL="HTTP"
+HEALTH_CHECK_PATH="/ec2meta-webpage/index.php"
+TARGET_TYPE="ip"
+TARGET_IPS=("10.1.21.102" "10.1.21.102" "10.1.22.102" "10.1.22.102")
+PROTOCOL_VERSION="HTTP1"
 
 # Get VPC ID
 VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=$VPC_NAME" --query "Vpcs[0].VpcId" --output text)
-echo "VPC ID: $VPC_ID"
 
-# Get Subnet IDs
-SUBNET_A_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=$SUBNET_A_NAME" --query "Subnets[0].SubnetId" --output text)
-SUBNET_B_ID=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=$SUBNET_B_NAME" --query "Subnets[0].SubnetId" --output text)
-echo "Subnet A ID: $SUBNET_A_ID"
-echo "Subnet B ID: $SUBNET_B_ID"
+if [ -z "$VPC_ID" ] || [ "$VPC_ID" == "None" ]; then
+  echo "Error: VPC with name '$VPC_NAME' not found."
+  exit 1
+fi
 
-# Get Security Group ID(s) that contain 'ALBSecurityGroup'
-SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=*$SECURITY_GROUP_NAME*" --query "SecurityGroups[0].GroupId" --output text)
-echo "Security Group ID: $SECURITY_GROUP_ID"
-
-# Create ALB
-ALB_VPC01_ARN=$(aws elbv2 create-load-balancer \
-    --name $ALB_NAME \
-    --subnets $SUBNET_A_ID $SUBNET_B_ID \
-    --security-groups $SECURITY_GROUP_ID \
-    --scheme internet-facing \
-    --type application \
-    --ip-address-type ipv4 \
-    --tags Key=$TAG_KEY,Value=$TAG_VALUE \
-    --query "LoadBalancers[0].LoadBalancerArn" --output text)
-echo "ALB ARN: $ALB_VPC01_ARN"
+# Create target group
+aws elbv2 create-target-group \
+    --name $TARGET_GROUP_NAME \
+    --protocol $PROTOCOL \
+    --port $PORT \
+    --vpc-id $VPC_ID \
+    --target-type $TARGET_TYPE \
+    --health-check-protocol $HEALTH_CHECK_PROTOCOL \
+    --health-check-path $HEALTH_CHECK_PATH \
+    --protocol-version $PROTOCOL_VERSION
 
 # Get Target Group ARN
-TARGET_GROUP01_ARN=$(aws elbv2 describe-target-groups --names $TARGET_GROUP_NAME --query "TargetGroups[0].TargetGroupArn" --output text)
-echo "Target Group ARN: $TARGET_GROUP01_ARN"
+TARGET_GROUP_ARN=$(aws elbv2 describe-target-groups --names $TARGET_GROUP_NAME --query "TargetGroups[0].TargetGroupArn" --output text)
 
-# Create Listener
-aws elbv2 create-listener \
-    --load-balancer-arn $ALB_VPC01_ARN \
-    --protocol HTTP \
-    --port 80 \
-    --default-actions Type=forward,TargetGroupArn=$TARGET_GROUP01_ARN
+# Register IP addresses as targets with AvailabilityZone=all
+for IP in "${TARGET_IPS[@]}"; do
+    aws elbv2 register-targets \
+        --target-group-arn $TARGET_GROUP_ARN \
+        --targets Id=$IP,AvailabilityZone=all
+done
 
-echo "ALB '$ALB_NAME' has been created with the specified configuration."
+echo "ALB Target Group '$TARGET_GROUP_NAME' has been created and targets have been registered."
