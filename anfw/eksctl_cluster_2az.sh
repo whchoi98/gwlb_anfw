@@ -1,7 +1,7 @@
 #!/bin/bash
 export VPC01_NAME=ANFW-VPC01
 export eksctl_filename=ekscluster01.yaml
-export EKS_VERSION="1.25"
+export EKS_VERSION="1.29"
 #Valuse="Subnet's Name tag's Value"
 #export AWS_REGION=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region')
 export AWS_REGION=ap-northeast-2
