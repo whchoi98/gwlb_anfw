@@ -37,7 +37,7 @@ TARGET_GROUP_ARN=$(aws elbv2 describe-target-groups --names $TARGET_GROUP_NAME -
 for IP in "${TARGET_IPS[@]}"; do
     aws elbv2 register-targets \
         --target-group-arn $TARGET_GROUP_ARN \
-        --targets Id=$IP
+        --targets Id=$IP,AvailabilityZone=all
 done
 
 echo "ALB Target Group '$TARGET_GROUP_NAME' has been created and targets have been registered."
