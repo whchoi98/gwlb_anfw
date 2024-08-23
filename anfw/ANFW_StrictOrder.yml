@@ -1037,7 +1037,7 @@ Resources:
                 DestinationPort: ANY
               RuleOptions:
                 - Keyword: "sid:3"
-            - Action: DROP
+            - Action: PERMIT
               Header:
                 Protocol: IP
                 Source: ANY
