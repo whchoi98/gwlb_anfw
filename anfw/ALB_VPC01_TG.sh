@@ -8,7 +8,7 @@ PORT=80
 HEALTH_CHECK_PROTOCOL="HTTP"
 HEALTH_CHECK_PATH="/ec2meta-webpage/index.php"
 TARGET_TYPE="ip"
-TARGET_IPS=("10.1.21.102" "10.1.21.102" "10.1.22.102" "10.1.22.102")
+TARGET_IPS=("10.1.21.101" "10.1.21.102" "10.1.22.101" "10.1.22.102")
 PROTOCOL_VERSION="HTTP1"
 
 # Get VPC ID
@@ -33,7 +33,7 @@ aws elbv2 create-target-group \
 # Get Target Group ARN
 TARGET_GROUP_ARN=$(aws elbv2 describe-target-groups --names $TARGET_GROUP_NAME --query "TargetGroups[0].TargetGroupArn" --output text)
 
-# Register IP addresses as targets
+# Register IP addresses as targets (without specifying AvailabilityZone for IP targets)
 for IP in "${TARGET_IPS[@]}"; do
     aws elbv2 register-targets \
         --target-group-arn $TARGET_GROUP_ARN \
