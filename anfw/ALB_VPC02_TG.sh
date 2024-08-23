@@ -33,7 +33,7 @@ aws elbv2 create-target-group \
 # Get Target Group ARN
 TARGET_GROUP_ARN=$(aws elbv2 describe-target-groups --names $TARGET_GROUP_NAME --query "TargetGroups[0].TargetGroupArn" --output text)
 
-# Register IP addresses as targets with AvailabilityZone=all
+# Register IP addresses as targets
 for IP in "${TARGET_IPS[@]}"; do
     aws elbv2 register-targets \
         --target-group-arn $TARGET_GROUP_ARN \
